@@ -1,0 +1,132 @@
+import Container from 'react-bootstrap/Container';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { useEffect } from 'react';
+import React from 'react'
+import {Link} from 'react-router-dom'
+
+const axios = require('axios');
+
+
+const RepoList = ({
+        setIsFetching,
+        username,
+        setError,
+        repoList,
+        setRepoList,
+        repoListRef,
+        setIsValidUser,
+        isValidUserRef
+    
+    }) => { 
+
+
+    useEffect(() => {
+        setError(false)
+        const fetchData = async () => {
+            try {
+                setIsFetching(true)
+                const userRes = await axios.get(`https://api.github.com/users/${username}`)
+                setIsFetching(false)
+                if(userRes.status===200){
+                    // console.log('in')
+                    setIsValidUser(true)    
+                }
+                console.log(userRes.data)
+            }
+            catch (e) {
+                //console.log(typeof e.response)
+                if(typeof e.response==='undefined'){
+                    setError('invalid username')
+                    setIsValidUser(false)
+                }
+                setIsFetching(false)
+            }
+
+            
+
+            if(isValidUserRef.current){
+                try{
+                    setIsFetching(true)
+                    const response = await axios.get(`https://api.github.com/users/${username}/repos`,)
+                    console.log(response.data)
+                    
+                    if(response.data.length > 0){
+                        var key;
+                        response.data.forEach(async(repo) => {
+                            if(repo.language !== null){
+                                key = repo.language
+                            }
+                            else{
+                                const res = await axios.get(`${repo.languages_url}`,)
+                                    key = (Object.keys(res.data).length === 0) ? 'no dominant language': Object.keys(res.data)[0]
+                            }
+                            var data = {}  
+                            if(!Object.keys(repoListRef.current).includes(key)){
+                                data = {...repoListRef.current, [key]: [{name:repo.name, description: repo.description, url: repo.html_url}] }
+                            }
+                            else{
+                                data = {...repoListRef.current}
+                                data[key].push({name:repo.name, description: repo.description, url: repo.html_url})
+                            }
+                            setRepoList(data)
+                        }) 
+                    }  
+                    else{
+                        setRepoList(0)
+                    }
+    
+                    setIsFetching(false)
+                        
+                }
+                catch (exception) {
+                    if(exception.response.status===404){
+                        setError('something went wrong!')
+                    }
+                    setRepoList(null)
+                    setIsFetching(false)
+                }
+            }
+        }
+        if(username){
+            fetchData()
+        }
+        return () => {
+            setRepoList([]); 
+        };
+    }, [isValidUserRef, repoListRef, setError, setIsFetching, setIsValidUser, setRepoList, username])
+    
+
+    var sortedKeys
+    if(repoList){
+        sortedKeys = Object.keys(repoList).sort((a, b) => repoList[b].length - repoList[a].length)
+    }
+
+    return (
+        <Container id='repos'>
+
+            {repoList!==0 && <ol id="recs" >
+                {sortedKeys.map((lang, index) => (
+                    <div key = {index}>
+                        <li key = {index} id="lang">{lang}</li>
+                        <div>
+                            <ol id='olist'>
+                                {repoList[lang].map((repo, i) => {
+                                    return <li key = {i}>
+                                        <p>name: {repo.name}</p>
+                                        <p>description: {repo.description ? repo.description: 'no description'}</p>
+                                        <p>url: <Link to = {repo.url}>{repo.url}</Link></p>
+                                    </li>
+                                })}
+                            </ol> 
+                        </div> 
+                    </div>
+                ))}
+            </ol>}
+
+            {repoList === 0 && <p style = {{textAlign:'center'}}>no repos</p>} 
+        </Container>
+    ); 
+
+}
+ 
+export default RepoList;
