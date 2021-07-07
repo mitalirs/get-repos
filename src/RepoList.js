@@ -31,11 +31,12 @@ const RepoList = ({
                     // console.log('in')
                     setIsValidUser(true)    
                 }
-                console.log(userRes.data)
+                //console.log(userRes.data)
             }
             catch (e) {
-                //console.log(typeof e.response)
-                if(typeof e.response==='undefined'){
+                if(e.isAxiosError===true){
+                    console.log('e')
+                    //console.log(e.response.data.message)
                     setError('invalid username')
                     setIsValidUser(false)
                 }
@@ -48,7 +49,7 @@ const RepoList = ({
                 try{
                     setIsFetching(true)
                     const response = await axios.get(`https://api.github.com/users/${username}/repos`,)
-                    console.log(response.data)
+                    //console.log(response.data)
                     
                     if(response.data.length > 0){
                         var key;
@@ -105,7 +106,7 @@ const RepoList = ({
         <Container id='repos'>
 
             {repoList!==0 && <ol id="recs" >
-                {sortedKeys.map((lang, index) => (
+                {sortedKeys && sortedKeys.map((lang, index) => (
                     <div key = {index}>
                         <li key = {index} id="lang">{lang}</li>
                         <div>
