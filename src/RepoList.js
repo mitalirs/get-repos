@@ -35,7 +35,6 @@ const RepoList = ({
             }
             catch (e) {
                 if(e.isAxiosError===true){
-                    console.log('e')
                     //console.log(e.response.data.message)
                     setError('invalid username')
                     setIsValidUser(false)
