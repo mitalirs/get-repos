@@ -34,9 +34,17 @@ const RepoList = ({
                 //console.log(userRes.data)
             }
             catch (e) {
-                if(e.isAxiosError===true){
-                    //console.log(e.response.data.message)
-                    setError('invalid username')
+                // console.log(Object.keys(e))
+                if(e.response.data.message.startsWith('You have sent an invalid request')){
+                    setError('invalid username!')
+                    setIsValidUser(false)
+                }
+                else if(e.response.data.message.startsWith('API rate limit exceeded')){
+                    setError('Please try again after sometime!')
+                    setIsValidUser(false)
+                }
+                else{
+                    setError('Something went wrong!')
                     setIsValidUser(false)
                 }
                 setIsFetching(false)
