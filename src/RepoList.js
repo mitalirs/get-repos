@@ -45,6 +45,7 @@ const RepoList = ({
                 }
                 else{
                     setError('Something went wrong!')
+                    console.log(e.response.data.message)
                     setIsValidUser(false)
                 }
                 setIsFetching(false)
@@ -87,6 +88,7 @@ const RepoList = ({
                         
                 }
                 catch (exception) {
+                    console.log(exception.response.data.message)
                     if(exception.response.status===404){
                         setError('something went wrong!')
                     }
