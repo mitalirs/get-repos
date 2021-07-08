@@ -2,7 +2,6 @@ import Container from 'react-bootstrap/Container';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useEffect } from 'react';
 import React from 'react'
-import {Link} from 'react-router-dom'
 
 const axios = require('axios');
 
@@ -124,7 +123,7 @@ const RepoList = ({
                                     return <li key = {i}>
                                         <p>name: {repo.name}</p>
                                         <p>description: {repo.description ? repo.description: 'no description'}</p>
-                                        <p>url: <Link to = {repo.url}>{repo.url}</Link></p>
+                                        <p>url: <a href={repo.url}>{repo.url}</a></p>
                                     </li>
                                 })}
                             </ol> 
